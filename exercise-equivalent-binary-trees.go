@@ -8,10 +8,11 @@ import (
 // Walk walks the tree t sending all values
 // from the tree to the channel ch.
 func Walk(t *tree.Tree, ch chan int) {
-	Walk(t.Left, ch)
+	if n := t.Left; n != nil { Walk(n, ch)}
 	ch <- t.Value
-	Walk(t.Right, ch)
+	if n := t.Right; n != nil { Walk(n, ch)}
 }
+
 
 // Same determines whether the trees
 // t1 and t2 contain the same values.
