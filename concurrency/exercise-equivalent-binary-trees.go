@@ -36,7 +36,7 @@ func WalkIn(t *tree.Tree, ch chan int) {
 	fmt.Println("<WalkIn(t,ch)>")
 	if n = t.Left; n != nil {
 		fmt.Print("L")
-		Walk(n, ch)
+		WalkIn(n, ch)
 	}
 	fmt.Print("V(")
 	v := t.Value
@@ -46,7 +46,7 @@ func WalkIn(t *tree.Tree, ch chan int) {
 
 	if n = t.Right; n != nil {
 		fmt.Print("R")
-		Walk(n, ch)
+		WalkIn(n, ch)
 	}
 	fmt.Println("</WalkIn(t,ch)>")
 }
@@ -70,9 +70,9 @@ func WalkerIn(t *tree.Tree, ch chan int) {
 	if t == nil {
 		return
 	}
-	Walker(t.Left, ch) // simpler, but causes "unecessary" call to Walker(nil, ch) sometimes.
+	WalkerIn(t.Left, ch) // simpler, but causes "unecessary" call to Walker(nil, ch) sometimes.
 	ch <- t.Value
-	Walker(t.Right, ch)
+	WalkerIn(t.Right, ch)
 }
 
 // Same determines whether the trees
