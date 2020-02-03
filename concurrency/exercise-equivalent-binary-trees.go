@@ -7,10 +7,33 @@ import (
 )
 
 // Walk walks the tree t sending all values
-// from the tree to the channel ch.
+// from the tree to the channel ch. Then closes ch.
 func Walk(t *tree.Tree, ch chan int) {
 	var n *tree.Tree
 	fmt.Println("<Walk(t,ch)>")
+	if n = t.Left; n != nil {
+		fmt.Print("L")
+		WalkIn(n, ch)
+	}
+	fmt.Print("V(")
+	v := t.Value
+	fmt.Printf("%v", v)
+	ch <- t.Value
+	fmt.Print(")")
+
+	if n = t.Right; n != nil {
+		fmt.Print("R")
+		WalkIn(n, ch)
+	}
+	fmt.Println("</Walk(t,ch)>")
+	close(ch) // at top level we can close ch
+}
+
+// WalkIn walks the tree t sending all values
+// from the tree to the channel ch.
+func WalkIn(t *tree.Tree, ch chan int) {
+	var n *tree.Tree
+	fmt.Println("<WalkIn(t,ch)>")
 	if n = t.Left; n != nil {
 		fmt.Print("L")
 		Walk(n, ch)
@@ -25,12 +48,25 @@ func Walk(t *tree.Tree, ch chan int) {
 		fmt.Print("R")
 		Walk(n, ch)
 	}
-	fmt.Println("</Walk(t,ch)>")
+	fmt.Println("</WalkIn(t,ch)>")
 }
 
-// Walk walks the tree t sending all values
-// from the tree to the channel ch.
+// Walker walks the tree t sending all values
+// from the tree to the channel ch. Closes ch.
 func Walker(t *tree.Tree, ch chan int) {
+	if t == nil {
+		close(ch)
+		return
+	}
+	WalkerIn(t.Left, ch) // simpler, but causes "unecessary" call to Walker(nil, ch) sometimes.
+	ch <- t.Value
+	WalkerIn(t.Right, ch)
+	close(ch)
+}
+
+// WalkerIn walks the tree t sending all values
+// from the tree to the channel ch.
+func WalkerIn(t *tree.Tree, ch chan int) {
 	if t == nil {
 		return
 	}
@@ -93,7 +129,6 @@ func TestWalk(walk func(t *tree.Tree, ch chan int), n int) {
 	fmt.Printf("</go walk(tree.New(%d), ch)>", n)
 
 	fmt.Println("Check ch")
-	close(ch) // or range will block, but it should by done by sender, walk(), not by us, reciever
 	fmt.Printf("ch# ")
 	for v := range ch {
 		fmt.Printf(" %d,", v)
