@@ -57,18 +57,18 @@ func SameCh(ch1, ch2 chan int) bool {
 	for {
 		v1, b1 := <-ch1
 		v2, b2 := <-ch1
-		
+
 		if !(b1 || b2) { // empty
 			fmt.Printf("!(b1 || b2): %v, %v, %v, %v\n", b1, b2, v1, v2)
 			return true
 		}
-		
+
 		if b1 != b2 { // different lengths
 			fmt.Printf("b1 != b2:  %v, %v, %v, %v\n", b1, b2, v1, v2)
 			return false
 		}
-		
-		if v1 != v2 {  // different values
+
+		if v1 != v2 { // different values
 			fmt.Printf("v1 != v2:  %v, %v, %v, %v\n", b1, b2, v1, v2)
 			return false
 		}
@@ -86,23 +86,28 @@ func main() {
 			// Then read and print 10 values from the channel. It should be the numbers 1, 2, 3, ..., 10.
 	*/
 
-	ch := make(chan int, 100)
-	fmt.Println("<go Walk(tree.New(2), ch)>")
-	go Walk(tree.New(2), ch)
-	fmt.Println("</go Walk(tree.New(2), ch)>")
+	ch2 := make(chan int, 100)
+	fmt.Println("<go Walk(tree.New(2), ch2)>")
+	go Walk(tree.New(2), ch2)
+	fmt.Println("</go Walk(tree.New(2), ch2)>")
+
+	fmt.Println("Check ch2")
+	close(ch2) // or range will block
+	for v := range ch2 {
+		fmt.Printf("ch2#%d, ", v)
+	}
 
 	ch3 := make(chan int, 100)
-	fmt.Println("<go Walker(tree.New(2), ch)>")
+	fmt.Println("<go Walker(tree.New(3), ch3)>")
 	go Walker(tree.New(3), ch3)
-	fmt.Println("</go Walker(tree.New(2), ch)>")
+	fmt.Println("</go Walker(tree.New(3), ch3)>")
 
-	fmt.Println("Check ch")
-	close(ch) // or range will block
-	for v := range ch {
-		fmt.Printf("ch#%d, ", v)
+	fmt.Println("Check ch3")
+	close(ch3) // or range will block
+	for v := range ch3 {
+		fmt.Printf("ch3#%d, ", v)
 	}
 
 	fmt.Println("Same(tree.New(1), tree.New(1)", Same(tree.New(1), tree.New(1)))
 	fmt.Println("Same(tree.New(1), tree.New(2))", Same(tree.New(1), tree.New(2)))
 }
-
