@@ -24,12 +24,14 @@ func Crawl(seen map[string]int, url string, depth int, fetcher Fetcher) {
 		fmt.Println(err)
 		return
 	}
-	fmt.Printf("found: %s %q\n", url, body)
+	// fmt.Printf("found: %s %q\n", url, body)
 	for _, u := range urls {
 		if n, s := seen[u]; s {
 			seen[u] = n + 1
+			fmt.Printf("seen %d: %s %q\n", seen[u], url, body)
 		} else {
 			seen[u] = 1
+			fmt.Printf("crawl: %s %q\n", url, body)
 			Crawl(seen, u, depth-1, fetcher)
 		}
 	}
