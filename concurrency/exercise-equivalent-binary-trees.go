@@ -78,7 +78,7 @@ func SameCh(ch1, ch2 chan int) bool {
 	return false // unreachable
 }
 
-func TestWalk(walk func(t *tree.Tree, ch chan int)) {
+func TestWalk(walk func(t *tree.Tree, ch chan int), n int) {
 	/* 2. Test the Walk function.
 	        // The function tree.New(k) constructs a randomly-structured (but always sorted) binary tree
 			// holding the values k, 2k, 3k, ..., 10k.
@@ -87,22 +87,23 @@ func TestWalk(walk func(t *tree.Tree, ch chan int)) {
 			// Then read and print 10 values from the channel. It should be the numbers 1, 2, 3, ..., 10.
 	*/
 
-	ch2 := make(chan int, 100)
-	fmt.Println("<go walk(tree.New(2), ch2)>")
-	go walk(tree.New(2), ch2)
-	fmt.Println("</go walk(tree.New(2), ch2)>")
+	ch := make(chan int, 100)
+	fmt.Printf("<go walk(tree.New(%d), ch)>\n", n)
+	go walk(tree.New(n), ch)
+	fmt.Printf("</go walk(tree.New(%d), ch)>", n)
 
-	fmt.Println("Check ch2")
-	close(ch2) // or range will block
-	for v := range ch2 {
-		fmt.Printf("ch2#%d, ", v)
+	fmt.Println("Check ch")
+	close(ch) // or range will block
+	fmt.Printf("ch# ")
+	for v := range ch {
+		fmt.Printf(" %d,", v)
 	}
 	return
 }
 
 func main() {
-	TestWalk(Walk)
-	TestWalk(Walker)
+	TestWalk(Walk, 2)
+	TestWalk(Walker, 3)
 
 	// Test Same
 	fmt.Println("Same(tree.New(1), tree.New(1)", Same(tree.New(1), tree.New(1)))
