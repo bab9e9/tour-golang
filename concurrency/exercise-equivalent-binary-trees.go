@@ -26,6 +26,7 @@ func Walk(t *tree.Tree, ch chan int) {
 		Walk(n, ch)
 	}
 	fmt.Println("</Walk(t,ch)>")
+	close(ch) // or range will block
 }
 
 // Walk walks the tree t sending all values
@@ -37,6 +38,7 @@ func Walker(t *tree.Tree, ch chan int) {
 	Walker(t.Left, ch) // simpler, but causes "unecessary" call to Walker(nil, ch) sometimes.
 	ch <- t.Value
 	Walker(t.Right, ch)
+	close(ch) // or range will block
 }
 
 // Same determines whether the trees
@@ -46,8 +48,6 @@ func Same(t1, t2 *tree.Tree) bool {
 	go Walk(t1, ch1)
 	ch2 := make(chan int, 100)
 	go Walk(t2, ch2)
-	close(ch1)
-	close(ch2)
 
 	return SameCh(ch1, ch2)
 }
@@ -92,7 +92,6 @@ func main() {
 	fmt.Println("</go Walk(tree.New(2), ch2)>")
 
 	fmt.Println("Check ch2")
-	close(ch2) // or range will block
 	for v := range ch2 {
 		fmt.Printf("ch2#%d, ", v)
 	}
@@ -103,7 +102,6 @@ func main() {
 	fmt.Println("</go Walker(tree.New(3), ch3)>")
 
 	fmt.Println("Check ch3")
-	close(ch3) // or range will block
 	for v := range ch3 {
 		fmt.Printf("ch3#%d, ", v)
 	}
