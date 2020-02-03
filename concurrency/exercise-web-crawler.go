@@ -38,9 +38,17 @@ func Crawl(seen map[string]int, url string, depth int, fetcher Fetcher) {
 	return
 }
 
+func echo(s string) {
+	fmt.Println(s)
+}
+
 func main() {
+	echo("call echo")
+	go echo("go echo")
 	urls := make(map[string]int)
-	Crawl(urls, "https://golang.org/", 4, fetcher)
+	go Crawl(urls, "https://golang.org/", 4, fetcher)
+	go echo("goooooooooooo echo")
+	echo("last echo")
 }
 
 // fakeFetcher is Fetcher that returns canned results.
