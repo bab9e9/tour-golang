@@ -88,7 +88,7 @@ func SameCh(ch1, ch2 chan int) bool {
 		num++
 		fmt.Printf("#%d ", num)
 		v1, b1 := <-ch1
-		v2, b2 := <-ch1
+		v2, b2 := <-ch2
 
 		if !(b1 || b2) { // empty
 			fmt.Printf("!(b1 || b2): %v, %v, %v, %v\n", b1, b2, v1, v2)
