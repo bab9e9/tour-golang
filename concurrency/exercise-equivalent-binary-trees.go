@@ -57,19 +57,23 @@ func SameCh(ch1, ch2 chan int) bool {
 	for {
 		v1, b1 := <-ch1
 		v2, b2 := <-ch1
-		if !(b1 || b2) {
-			fmt.Printf("!(b1 || b2): %v, %v", b1, b2)
+		
+		if !(b1 || b2) { // empty
+			fmt.Printf("!(b1 || b2): %v, %v, %v, %v\n", b1, b2, v1, v2)
 			return true
-		} // empty
-		if b1 != b2 {
-			fmt.Printf("b1 != b2: %v, %v", b1, b2)
+		}
+		
+		if b1 != b2 { // different lengths
+			fmt.Printf("b1 != b2:  %v, %v, %v, %v\n", b1, b2, v1, v2)
 			return false
-		} // different lengths
-		if v1 != v2 {
-			fmt.Printf("v1 != v2: %v, %v", v1, v2)
+		}
+		
+		if v1 != v2 {  // different values
+			fmt.Printf("v1 != v2:  %v, %v, %v, %v\n", b1, b2, v1, v2)
 			return false
-		} // different values
+		}
 	}
+	fmt.Println("unreachable?")
 	return false // unreachable
 }
 
