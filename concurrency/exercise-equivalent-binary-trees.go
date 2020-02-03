@@ -93,7 +93,7 @@ func TestWalk(walk func(t *tree.Tree, ch chan int), n int) {
 	fmt.Printf("</go walk(tree.New(%d), ch)>", n)
 
 	fmt.Println("Check ch")
-	close(ch) // or range will block
+	close(ch) // or range will block, but it should by done by sender, walk(), not by us, reciever
 	fmt.Printf("ch# ")
 	for v := range ch {
 		fmt.Printf(" %d,", v)
