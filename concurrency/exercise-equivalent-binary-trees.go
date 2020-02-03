@@ -65,6 +65,7 @@ func main() {
 	fmt.Println("</go Walker(tree.New(2), ch)>")
 
 	fmt.Println("Check ch")
+	close(ch)	// or range will block
 	for v := range ch {
 		fmt.Printf("ch#%d, ", v)
 	}
@@ -72,5 +73,4 @@ func main() {
 	fmt.Println("Same(tree.New(1), tree.New(1)", Same(tree.New(1), tree.New(1)))
 	fmt.Println("Same(tree.New(1), tree.New(2))", Same(tree.New(1), tree.New(2)))
 }
-
 
