@@ -49,21 +49,18 @@ func Same(t1, t2 *tree.Tree) bool {
 	close(ch1)
 	close(ch2)
 
-	close(ch1)
-	close(ch2)
-
 	return SameCh(ch1, ch2)
 }
 
 // Same determines whether t1 and t2 contain the same values.
-func SameCh(ch1, ch2 *chan int) bool {
+func SameCh(ch1, ch2 chan int) bool {
 	for {
 		v1, b1 := <-ch1
 		v2, b2 := <-ch1
 		if !(b1 || b2) {
 			return true
 		} // empty
-		if b1 ^ b2 {
+		if b1 != b2 {
 			return false
 		} // different lengths
 		if v1 != v2 {
