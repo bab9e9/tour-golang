@@ -21,15 +21,13 @@ func Same(t1, t2 *tree.Tree) bool {
 }
 
 func main() {
-	/* 2. Test the Walk function. 
-	 The function tree.New(k) constructs a randomly-structured (but always sorted) binary tree holding the values k, 2k, 3k, ..., 10k.
-
-Create a new channel ch and kick off the walker:
-
-go Walk(tree.New(1), ch)
-
-Then read and print 10 values from the channel. It should be the numbers 1, 2, 3, ..., 10.
-	*/
+	        /* 2. Test the Walk function.
+        // The function tree.New(k) constructs a randomly-structured (but always sorted) binary tree 
+		// holding the values k, 2k, 3k, ..., 10k.
+		// Create a new channel ch and kick off the walker:
+		//	go Walk(tree.New(1), ch)
+		// Then read and print 10 values from the channel. It should be the numbers 1, 2, 3, ..., 10.
+        */
 	ch := make(chan int)
 	go Walk(tree.New(1), ch)
 	for i := range ch {

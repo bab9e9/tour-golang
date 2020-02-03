@@ -73,3 +73,4 @@ func main() {
 	fmt.Println("Same(tree.New(1), tree.New(2))", Same(tree.New(1), tree.New(2)))
 }
 
+
