@@ -10,47 +10,50 @@ type Fetcher interface {
 	Fetch(url string) (body string, urls []string, err error)
 }
 
-type SafeCounter struct {
-	v   map[string]bool
+type SafeMap struct {
+	m   map[string]int
 	mux sync.Mutex
 }
-var c SafeCounter = SafeCounter{v: make(map[string]bool)}
-func (s SafeCounter)checkvisited(url string)bool{
-	s.mux.Lock()
-	defer s.mux.Unlock()
-	_,ok:=s.v[url]
-	if ok==false {
-		s.v[url]=true
-		return false
+var visits SafeMap = SafeMap{v: make(map[string]int)}
+
+func (sm SafeMap)SafeVisit(url string)int{
+	sm.mux.Lock()
+	defer sm.mux.Unlock()
+	_,ok:=sm.m[url]
+	n := 1
+	if ok {
+		n = sm.m[url] + 1
 	}
-	return true
-	
+	sm.m[url] = n
+	return n
 }
 
 // Crawl uses fetcher to recursively crawl
 // pages starting with url, to a maximum of depth.
-func Crawl(seen map[string]int, url string, depth int, fetcher Fetcher) {
+func Crawl(url string, depth int, fetcher Fetcher) {
 	// TODO: Fetch URLs in parallel.
 	// TODO: Don't fetch the same URL twice.
 	// This implementation doesn't do either:
 	if depth <= 0 {
 		return
 	}
+	nv := visits.SafeVisit(url)	// record every visit
+	fmt.Printf("visits %d: %s %q\n", nv, url, body)
+	if nv > 1 {
+		return 
+	}
+	// assert(nv == 1)
 	body, urls, err := fetcher.Fetch(url)
+	
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
-	// fmt.Printf("found: %s %q\n", url, body)
+	fmt.Printf("found: %s %q\n", url, body)
+
 	for _, u := range urls {
-		if n, s := seen[u]; s {
-			seen[u] = n + 1
-			fmt.Printf("seen %d: %s %q\n", seen[u], url, body)
-		} else {
-			seen[u] = 1
-			fmt.Printf("crawl: %s %q\n", url, body)
-			Crawl(seen, u, depth-1, fetcher)
-		}
+		fmt.Printf("crawl: %s %q\n", url, body)
+		go Crawl(u, depth-1, fetcher)
 	}
 	return
 }
@@ -60,12 +63,7 @@ func echo(s string) {
 }
 
 func main() {
-	echo("call echo")
-	go echo("go echo")
-	urls := make(map[string]int)
-	go Crawl(urls, "https://golang.org/", 4, fetcher)
-	go echo("goooooooooooo echo")
-	echo("last echo")
+	go Crawl("https://golang.org/", 4, fetcher)
 }
 
 // fakeFetcher is Fetcher that returns canned results.
