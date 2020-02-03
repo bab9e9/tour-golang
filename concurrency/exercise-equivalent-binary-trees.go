@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-
 	"golang.org/x/tour/tree"
 )
 
@@ -15,11 +14,9 @@ func Walk(t *tree.Tree, ch chan int) {
 		fmt.Print("L")
 		WalkIn(n, ch)
 	}
-	fmt.Print("V(")
-	v := t.Value
-	fmt.Printf("%v", v)
+	
+	fmt.Printf("V(%v)", t.Value)
 	ch <- t.Value
-	fmt.Print(")")
 
 	if n = t.Right; n != nil {
 		fmt.Print("R")
@@ -38,11 +35,8 @@ func WalkIn(t *tree.Tree, ch chan int) {
 		fmt.Print("L")
 		WalkIn(n, ch)
 	}
-	fmt.Print("V(")
-	v := t.Value
-	fmt.Printf("%v", v)
+	fmt.Printf("V(%v)", t.Value)
 	ch <- t.Value
-	fmt.Print(")")
 
 	if n = t.Right; n != nil {
 		fmt.Print("R")
@@ -79,19 +73,20 @@ func WalkerIn(t *tree.Tree, ch chan int) {
 // t1 and t2 contain the same values.
 func Same(t1, t2 *tree.Tree) bool {
 	ch1 := make(chan int, 100)
-	go Walk(t1, ch1)
-	close(ch1) // or range will block
+	go Walker(t1, ch1)
 
 	ch2 := make(chan int, 100)
-	go Walk(t2, ch2)
-	close(ch2) // or range will block
+	go Walker(t2, ch2)
 
 	return SameCh(ch1, ch2)
 }
 
 // Same determines whether t1 and t2 contain the same values.
 func SameCh(ch1, ch2 chan int) bool {
+	num := 0
 	for {
+		num++
+		fmt.Printf("#%d ", num)
 		v1, b1 := <-ch1
 		v2, b2 := <-ch1
 
@@ -141,6 +136,8 @@ func main() {
 	TestWalk(Walker, 3)
 
 	// Test Same
-	fmt.Println("Same(tree.New(1), tree.New(1)", Same(tree.New(1), tree.New(1)))
-	fmt.Println("Same(tree.New(1), tree.New(2))", Same(tree.New(1), tree.New(2)))
+	fmt.Println("===========================Same(tree.New(2), tree.New(2)=====================")
+	fmt.Println(Same(tree.New(2), tree.New(2)))
+	fmt.Println("===========================Same(tree.New(3), tree.New(5)=====================")
+	fmt.Println(Same(tree.New(3), tree.New(5)))
 }
