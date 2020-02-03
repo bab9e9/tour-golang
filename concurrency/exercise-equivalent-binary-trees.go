@@ -26,7 +26,6 @@ func Walk(t *tree.Tree, ch chan int) {
 		Walk(n, ch)
 	}
 	fmt.Println("</Walk(t,ch)>")
-	close(ch) // or range will block
 }
 
 // Walk walks the tree t sending all values
@@ -38,7 +37,6 @@ func Walker(t *tree.Tree, ch chan int) {
 	Walker(t.Left, ch) // simpler, but causes "unecessary" call to Walker(nil, ch) sometimes.
 	ch <- t.Value
 	Walker(t.Right, ch)
-	close(ch) // or range will block
 }
 
 // Same determines whether the trees
@@ -46,8 +44,11 @@ func Walker(t *tree.Tree, ch chan int) {
 func Same(t1, t2 *tree.Tree) bool {
 	ch1 := make(chan int, 100)
 	go Walk(t1, ch1)
+	close(ch1) // or range will block
+
 	ch2 := make(chan int, 100)
 	go Walk(t2, ch2)
+	close(ch2) // or range will block
 
 	return SameCh(ch1, ch2)
 }
@@ -77,7 +78,7 @@ func SameCh(ch1, ch2 chan int) bool {
 	return false // unreachable
 }
 
-func main() {
+func TestWalk(walk func(t *tree.Tree, ch chan int)) {
 	/* 2. Test the Walk function.
 	        // The function tree.New(k) constructs a randomly-structured (but always sorted) binary tree
 			// holding the values k, 2k, 3k, ..., 10k.
@@ -87,25 +88,23 @@ func main() {
 	*/
 
 	ch2 := make(chan int, 100)
-	fmt.Println("<go Walk(tree.New(2), ch2)>")
-	go Walk(tree.New(2), ch2)
-	fmt.Println("</go Walk(tree.New(2), ch2)>")
+	fmt.Println("<go walk(tree.New(2), ch2)>")
+	go walk(tree.New(2), ch2)
+	fmt.Println("</go walk(tree.New(2), ch2)>")
 
 	fmt.Println("Check ch2")
+	close(ch2) // or range will block
 	for v := range ch2 {
 		fmt.Printf("ch2#%d, ", v)
 	}
+	return
+}
 
-	ch3 := make(chan int, 100)
-	fmt.Println("<go Walker(tree.New(3), ch3)>")
-	go Walker(tree.New(3), ch3)
-	fmt.Println("</go Walker(tree.New(3), ch3)>")
+func main() {
+	TestWalk(Walk)
+	TestWalk(Walker)
 
-	fmt.Println("Check ch3")
-	for v := range ch3 {
-		fmt.Printf("ch3#%d, ", v)
-	}
-
+	// Test Same
 	fmt.Println("Same(tree.New(1), tree.New(1)", Same(tree.New(1), tree.New(1)))
 	fmt.Println("Same(tree.New(1), tree.New(2))", Same(tree.New(1), tree.New(2)))
 }
